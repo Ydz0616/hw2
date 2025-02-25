@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: song-recommender-ml-job
+  namespace: yuandong
+spec:
+  template:
+    metadata:
+      labels:
+        app: yuandong-song-recommender-ml
+    spec:
+      initContainers:
+      - name: copy-datasets
+        image: busybox
+        command: ["sh", "-c", "mkdir -p /shared/data && cp -r /home/yuandong/hw2/data/* /shared/data/ && chmod -R 777 /shared"]
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /shared
+        - name: host-volume
+          mountPath: /home/yuandong
+      containers:
+      - name: song-recommender-ml
+        image: yuandongzhang/song-recommender-ml:1.0.1
+        env:
+        - name: SHARED_DIR
+          value: "/shared"
+        - name: DATA_DIR
+          value: "/shared/data"
+        - name: MIN_SUPPORT
+          value: "0.05"
+        - name: MIN_CONFIDENCE
+          value: "0.01"
+        - name: MAX_PLAYLISTS
+          value: "500"
+        - name: MAX_SONGS_PER_PLAYLIST
+          value: "20"
+        - name: PLAYLIST_FILE
+          value: "/shared/data/2023_spotify_ds2.csv"
+        - name: SONGS_FILE
+          value: "/shared/data/2023_spotify_songs.csv"
+        - name: MODEL_FILE
+          value: "/shared/models/song_recommender.pkl"
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /shared
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+      volumes:
+      - name: shared-volume
+        persistentVolumeClaim:
+          claimName: song-recommender-pvc
+      - name: host-volume
+        hostPath:
+          path: /home/yuandong
+      restartPolicy: OnFailure 

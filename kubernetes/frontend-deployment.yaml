@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: song-recommender-frontend
+  namespace: yuandong
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yuandong-song-recommender-frontend
+  template:
+    metadata:
+      labels:
+        app: yuandong-song-recommender-frontend
+    spec:
+      containers:
+      - name: song-recommender-frontend
+        image: yuandongzhang/song-recommender-frontend:1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        env:
+        - name: SHARED_DIR
+          value: "/shared"
+        - name: FLASK_HOST
+          value: "0.0.0.0"
+        - name: FLASK_PORT
+          value: "5000"
+        - name: CHECK_INTERVAL
+          value: "10"
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /shared
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "300m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: shared-volume
+        persistentVolumeClaim:
+          claimName: song-recommender-pvc 

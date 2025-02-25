@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: song-recommender-pvc
+  namespace: yuandong
+spec:
+  # 删除选择器，因为它可能限制了 PVC 只能绑定到特定标签的 PV
+  # selector:
+  #   matchLabels:
+  #     namespace: yuandong
+  storageClassName: standard
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+      
+
