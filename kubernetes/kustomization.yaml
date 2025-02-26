@@ -10,7 +10,7 @@ resources:
 configMapGenerator:
 - name: ml-training-config
   literals:
-  - DATASET=ds2
+  - DATASET=ds1
   - MIN_SUPPORT=0.01
   - MIN_CONFIDENCE=0.01
   - MAX_PLAYLISTS=1000
