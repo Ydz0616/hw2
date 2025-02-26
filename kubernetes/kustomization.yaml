@@ -7,6 +7,12 @@ resources:
 - frontend-service.yaml
 - pvc.yaml
 
+# We'll use overlays for different datasets instead of trying to use variables
+# See the overlays/ds1 and overlays/ds2 directories for dataset-specific configurations
+
+# To switch datasets, simply change the DATASET value below to either "ds1" or "ds2"
+# and change the Job name suffix in the patch section to match
+
 configMapGenerator:
 - name: ml-training-config
   literals:
@@ -19,10 +25,21 @@ configMapGenerator:
 patches:
 - patch: |-
     - op: replace
-      path: /metadata/name
-      value: song-recommender-ml-job-ds2-$(DATASET)
+      path: /metadata/generateName
+      value: song-recommender-ml-job-ds1-
   target:
     kind: Job
-    name: song-recommender-ml-job
+    generateName: song-recommender-ml-job-
 
-    
+# Adding a var reference for DATE to include current timestamp
+vars:
+- name: DATE
+  objref:
+    kind: ConfigMap
+    name: ml-training-config
+    apiVersion: v1
+  fieldref:
+    fieldpath: metadata.annotations.date
+# This annotation will be added via command line when applying kustomize
+# kubectl create -k . --kustomize-flag="configMapGenerator[0].annotations.date=$(date +%Y%m%d-%H%M%S)"
+

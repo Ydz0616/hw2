@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: song-recommender-ml-job
+  generateName: song-recommender-ml-job-
   namespace: yuandong
 spec:
   template:
