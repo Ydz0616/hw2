@@ -15,3 +15,14 @@ configMapGenerator:
   - MIN_CONFIDENCE=0.01
   - MAX_PLAYLISTS=1000
   - MAX_SONGS_PER_PLAYLIST=1000
+
+patches:
+- patch: |-
+    - op: replace
+      path: /metadata/name
+      value: song-recommender-ml-job-ds2-$(DATASET)
+  target:
+    kind: Job
+    name: song-recommender-ml-job
+
+    
