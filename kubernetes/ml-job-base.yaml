@@ -38,7 +38,7 @@ spec:
         - name: MODEL_FILE
           value: "/shared/models/song_recommender.pkl"
         command: ["/bin/sh", "-c"]
-        args
+        args:
           - |
           
             # Execute the training script
