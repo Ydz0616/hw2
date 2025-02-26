@@ -11,7 +11,7 @@ configMapGenerator:
 - name: ml-training-config
   literals:
   - DATASET=ds1
-  - MIN_SUPPORT=0.05
+  - MIN_SUPPORT=0.01
   - MIN_CONFIDENCE=0.01
-  - MAX_PLAYLISTS=500
-  - MAX_SONGS_PER_PLAYLIST=20
+  - MAX_PLAYLISTS=1000
+  - MAX_SONGS_PER_PLAYLIST=1000
