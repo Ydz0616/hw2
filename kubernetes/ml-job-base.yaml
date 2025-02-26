@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  generateName: song-recommender-ml-job-
+  name: song-recommender-ml-job-ds1
   namespace: yuandong
 spec:
   template:
@@ -32,20 +32,15 @@ spec:
         - name: DATA_DIR
           value: "/shared/data"
         - name: PLAYLIST_FILE
-          valueFrom:
-            configMapKeyRef:
-              name: ml-training-config
-              key: DATASET
+          value: "/shared/data/2023_spotify_ds1.csv"
         - name: SONGS_FILE
           value: "/shared/data/2023_spotify_songs.csv"
         - name: MODEL_FILE
           value: "/shared/models/song_recommender.pkl"
         command: ["/bin/sh", "-c"]
-        args:
+        args
           - |
-            # Set the playlist file based on the dataset parameter
-            export PLAYLIST_FILE="/shared/data/2023_spotify_${DATASET}.csv"
-            echo "Using playlist file: $PLAYLIST_FILE"
+          
             # Execute the training script
             python /app/train_model.py
         volumeMounts:

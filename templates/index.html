@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song Recommendation System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Song Recommendation System</h1>
+            <p>Get personalized song recommendations based on your favorite tracks</p>
+        </header>
+        
+        <main>
+            <section class="input-section">
+                <h2>Enter Songs</h2>
+                <p>Type song names and press Enter or click Add to build your list</p>
+                
+                <div class="input-container">
+                    <input type="text" id="song-input" placeholder="Enter a song name...">
+                    <button id="add-song-btn">Add</button>
+                </div>
+                
+                <div class="input-songs">
+                    <h3>Your Selected Songs:</h3>
+                    <ul id="song-list"></ul>
+                    <button id="clear-songs-btn">Clear All</button>
+                </div>
+                
+                <div class="recommendations-count">
+                    <label for="recommendations-count">Number of recommendations:</label>
+                    <select id="recommendations-count">
+                        <option value="3">3</option>
+                        <option value="5" selected>5</option>
+                        <option value="7">7</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
+                
+                <button id="get-recommendations-btn">Get Recommendations</button>
+            </section>
+            
+            <section class="results-section" id="results-section">
+                <h2>Recommendations</h2>
+                <div id="loading" class="loading hidden">
+                    <div class="spinner"></div>
+                    <p>Finding the perfect songs for you...</p>
+                </div>
+                <div id="error-message" class="error-message hidden"></div>
+                
+                <div class="recommendation-tabs">
+                    <button class="tab-button active" data-tab="combined">Combined</button>
+                    <button class="tab-button" data-tab="rules">Association Rules</button>
+                    <button class="tab-button" data-tab="similarity">Name Similarity</button>
+                </div>
+                
+                <div class="tab-content active" id="combined-tab">
+                    <h3>Combined Recommendations</h3>
+                    <p class="tab-description">Balanced recommendations using both association rules and name similarity</p>
+                    <ul id="recommendations-list"></ul>
+                </div>
+                
+                <div class="tab-content" id="rules-tab">
+                    <h3>Association Rule Recommendations</h3>
+                    <p class="tab-description">Recommendations based on songs that frequently appear together in playlists</p>
+                    <ul id="rule-recommendations-list"></ul>
+                </div>
+                
+                <div class="tab-content" id="similarity-tab">
+                    <h3>Name Similarity Recommendations</h3>
+                    <p class="tab-description">Recommendations based on songs with similar names</p>
+                    <ul id="similarity-recommendations-list"></ul>
+                </div>
+                
+                <div id="model-info" class="model-info hidden">
+                    <p>Model version: <span id="model-version"></span></p>
+                    <p>Model date: <span id="model-date"></span></p>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>© 2023 Song Recommendation System | Built with Flask and JavaScript</p>
+        </footer>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html> 
