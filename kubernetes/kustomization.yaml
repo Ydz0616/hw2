@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ml-job-base.yaml
+- frontend-deployment.yaml
+- frontend-service.yaml
+- pvc.yaml
+
+configMapGenerator:
+- name: ml-training-config
+  literals:
+  - DATASET=ds1
+  - MIN_SUPPORT=0.05
+  - MIN_CONFIDENCE=0.01
+  - MAX_PLAYLISTS=500
+  - MAX_SONGS_PER_PLAYLIST=20

@@ -21,25 +21,32 @@ spec:
       containers:
       - name: song-recommender-ml
         image: yuandongzhang/song-recommender-ml:1.0.1
+        envFrom:
+        - configMapRef:
+            name: ml-training-config
         env:
         - name: SHARED_DIR
           value: "/shared"
         - name: DATA_DIR
           value: "/shared/data"
-        - name: MIN_SUPPORT
-          value: "0.03"
-        - name: MIN_CONFIDENCE
-          value: "0.01"
-        - name: MAX_PLAYLISTS
-          value: "500"
-        - name: MAX_SONGS_PER_PLAYLIST
-          value: "20"
         - name: PLAYLIST_FILE
-          value: "/shared/data/2023_spotify_ds2.csv"
+          valueFrom:
+            configMapKeyRef:
+              name: ml-training-config
+              key: DATASET
+              # This transforms the ds1/ds2 value into the actual file path
         - name: SONGS_FILE
           value: "/shared/data/2023_spotify_songs.csv"
         - name: MODEL_FILE
           value: "/shared/models/song_recommender.pkl"
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            # Set the playlist file based on the dataset parameter
+            export PLAYLIST_FILE="/shared/data/2023_spotify_${DATASET}.csv"
+            echo "Using playlist file: $PLAYLIST_FILE"
+            # Execute the training script
+            python /app/train_model.py
         volumeMounts:
         - name: shared-volume
           mountPath: /shared
@@ -57,4 +64,4 @@ spec:
       - name: host-volume
         hostPath:
           path: /home/yuandong
-      restartPolicy: OnFailure 
+      restartPolicy: OnFailure
