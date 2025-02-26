@@ -27,7 +27,7 @@ spec:
         - name: DATA_DIR
           value: "/shared/data"
         - name: MIN_SUPPORT
-          value: "0.05"
+          value: "0.03"
         - name: MIN_CONFIDENCE
           value: "0.01"
         - name: MAX_PLAYLISTS
