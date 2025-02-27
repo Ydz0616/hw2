@@ -12,7 +12,14 @@ configMapGenerator:
 - name: ml-training-config
   literals:
   - DATASET=ds1
-  - MIN_SUPPORT=0.01
-  - MIN_CONFIDENCE=0.01
-  - MAX_PLAYLISTS=1000
-  - MAX_SONGS_PER_PLAYLIST=1000
+  - MIN_SUPPORT=0.05
+  - MIN_CONFIDENCE=0.1
+
+vars:
+- name: DATASET
+  objref:
+    kind: ConfigMap
+    name: ml-training-config
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.DATASET

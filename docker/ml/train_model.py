@@ -8,7 +8,6 @@ This script will train the model and save it to the shared volume.
 import os
 import sys
 import time
-import pickle
 import logging
 import hashlib
 import json
@@ -35,14 +34,11 @@ MODEL_DIR = os.path.join(SHARED_DIR, 'models')
 PLAYLIST_FILE = os.environ.get('PLAYLIST_FILE', os.path.join(DATA_DIR, '2023_spotify_ds2.csv'))
 SONGS_FILE = os.environ.get('SONGS_FILE', os.path.join(DATA_DIR, '2023_spotify_songs.csv'))
 MODEL_FILE = os.environ.get('MODEL_FILE', os.path.join(MODEL_DIR, 'song_recommender.pkl'))
-RULES_FILE = os.environ.get('RULES_FILE', os.path.join(MODEL_DIR, 'association_rules.csv'))
 INFO_FILE = os.environ.get('INFO_FILE', os.path.join(MODEL_DIR, 'model_info.json'))
 
 # Training parameters
-MIN_SUPPORT = float(os.environ.get('MIN_SUPPORT', '0.002'))
-MIN_CONFIDENCE = float(os.environ.get('MIN_CONFIDENCE', '0.01'))
-MAX_PLAYLISTS = int(os.environ.get('MAX_PLAYLISTS', '3000'))
-MAX_SONGS_PER_PLAYLIST = int(os.environ.get('MAX_SONGS_PER_PLAYLIST', '50'))
+MIN_SUPPORT = float(os.environ.get('MIN_SUPPORT', '0.05'))
+MIN_CONFIDENCE = float(os.environ.get('MIN_CONFIDENCE', '0.1'))
 
 def calculate_file_hash(file_path):
     """Calculate MD5 hash of a file."""
@@ -51,7 +47,6 @@ def calculate_file_hash(file_path):
     
     md5_hash = hashlib.md5()
     with open(file_path, "rb") as f:
-        # Read in chunks to handle large files
         for chunk in iter(lambda: f.read(4096), b""):
             md5_hash.update(chunk)
     return md5_hash.hexdigest()
@@ -86,74 +81,25 @@ def save_model_info(model_file, training_parameters):
     logger.info(f"Model info saved to {INFO_FILE}")
     return model_info
 
-def save_rules_to_file(recommender, output_file=RULES_FILE):
-    """Save all generated association rules to a CSV file for easier viewing."""
-    if recommender.association_rules is None or recommender.association_rules.empty:
-        logger.info("No rules to save.")
-        return
-    
-    # Ensure directory exists
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
-    
-    # Format rules for CSV
-    rules_data = []
-    for _, rule in recommender.association_rules.iterrows():
-        antecedent = list(rule['antecedents'])
-        consequent = list(rule['consequents'])
-        support = rule['support']
-        confidence = rule['confidence']
-        lift = rule['lift']
-        
-        rules_data.append({
-            'Antecedent': str(antecedent),
-            'Consequent': str(consequent),
-            'Support': support,
-            'Confidence': confidence,
-            'Lift': lift
-        })
-    
-    # Sort by confidence for easier viewing
-    rules_data.sort(key=lambda x: x['Confidence'], reverse=True)
-    
-    # Write to CSV
-    import csv
-    with open(output_file, 'w', newline='') as f:
-        fields = ['Antecedent', 'Consequent', 'Support', 'Confidence', 'Lift']
-        writer = csv.DictWriter(f, fieldnames=fields)
-        writer.writeheader()
-        writer.writerows(rules_data)
-    
-    logger.info(f"Saved {len(rules_data)} rules to {output_file}")
-
 def main():
     """Main function to train the model and save it."""
     # Ensure the model directory exists
     os.makedirs(MODEL_DIR, exist_ok=True)
     
     logger.info("Starting model training...")
-    logger.info(f"Parameters:")
-    logger.info(f"  - MIN_SUPPORT: {MIN_SUPPORT}")
-    logger.info(f"  - MIN_CONFIDENCE: {MIN_CONFIDENCE}")
-    logger.info(f"  - MAX_PLAYLISTS: {MAX_PLAYLISTS}")
-    logger.info(f"  - MAX_SONGS_PER_PLAYLIST: {MAX_SONGS_PER_PLAYLIST}")
-    logger.info(f"  - PLAYLIST_FILE: {PLAYLIST_FILE}")
-    logger.info(f"  - SONGS_FILE: {SONGS_FILE}")
-    logger.info(f"  - MODEL_FILE: {MODEL_FILE}")
+    logger.info(f"Parameters: MIN_SUPPORT: {MIN_SUPPORT}, MIN_CONFIDENCE: {MIN_CONFIDENCE}")
+    logger.info(f"Files: PLAYLIST_FILE: {PLAYLIST_FILE}, SONGS_FILE: {SONGS_FILE}")
     
     # Check if data files exist
-    if not os.path.exists(PLAYLIST_FILE):
-        logger.error(f"Playlist file not found: {PLAYLIST_FILE}")
-        return 1
-    
-    if not os.path.exists(SONGS_FILE):
-        logger.error(f"Songs file not found: {SONGS_FILE}")
+    if not os.path.exists(PLAYLIST_FILE) or not os.path.exists(SONGS_FILE):
+        logger.error(f"Data files not found")
         return 1
     
     try:
-        # Create a new recommender
+        # Create and train recommender
         recommender = SongRecommender()
         
-        # Load and prepare data
+        # Load data
         logger.info("Loading and preparing data...")
         recommender.load_and_prepare_data(
             playlist_file=PLAYLIST_FILE,
@@ -164,26 +110,19 @@ def main():
         recommender.min_support = MIN_SUPPORT
         recommender.min_confidence = MIN_CONFIDENCE
         
-        # Mine frequent itemsets
-        logger.info("Mining frequent itemsets...")
-        recommender.mine_frequent_itemsets(
-            max_playlists=MAX_PLAYLISTS,
-            max_songs_per_playlist=MAX_SONGS_PER_PLAYLIST
-        )
+        # Mine frequent itemsets using Apriori
+        logger.info("Mining frequent itemsets using Apriori algorithm...")
+        recommender.mine_frequent_itemsets()
         
         # Save the model
         logger.info(f"Saving model to {MODEL_FILE}...")
         recommender.save_model(MODEL_FILE)
         
-        # Save rules to file
-        save_rules_to_file(recommender)
-        
         # Save model info
         training_parameters = {
             "min_support": MIN_SUPPORT,
             "min_confidence": MIN_CONFIDENCE,
-            "max_playlists": MAX_PLAYLISTS,
-            "max_songs_per_playlist": MAX_SONGS_PER_PLAYLIST
+            "algorithm": "apriori"
         }
         save_model_info(MODEL_FILE, training_parameters)
         
@@ -192,6 +131,8 @@ def main():
     
     except Exception as e:
         logger.error(f"Error during training: {e}")
+        import traceback
+        traceback.print_exc()
         return 1
 
 if __name__ == "__main__":

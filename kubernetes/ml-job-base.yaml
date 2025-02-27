@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: song-recommender-ml-job-ds1
+  name: song-recommender-ml-job-ds-$(DATASET)
   namespace: yuandong
 spec:
   template:
@@ -12,8 +12,7 @@ spec:
       initContainers:
       - name: copy-datasets
         image: busybox
-        imagePullPolicy: Always
-        command: ["sh", "-c", "mkdir -p /shared/data && cp -r /home/yuandong/hw2/data/* /shared/data/ && chmod -R 777 /shared"]
+        command: ["sh", "-c", "cp -r /home/yuandong/hw2/data/* /shared/data/"]
         volumeMounts:
         - name: shared-volume
           mountPath: /shared
@@ -21,38 +20,24 @@ spec:
           mountPath: /home/yuandong
       containers:
       - name: song-recommender-ml
-        image: yuandongzhang/song-recommender-ml:1.0.1
-        imagePullPolicy: Always
-        envFrom:
-        - configMapRef:
-            name: ml-training-config
+        image: yuandongzhang/song-recommender-ml:1.0.3
         env:
-        - name: SHARED_DIR
-          value: "/shared"
         - name: DATA_DIR
           value: "/shared/data"
-        - name: PLAYLIST_FILE
-          value: "/shared/data/2023_spotify_ds1.csv"
-        - name: SONGS_FILE
-          value: "/shared/data/2023_spotify_songs.csv"
-        - name: MODEL_FILE
-          value: "/shared/models/song_recommender.pkl"
-        command: ["/bin/sh", "-c"]
-        args:
-          - |
-          
-            # Execute the training script
-            python /app/train_model.py
+        - name: MIN_SUPPORT
+          valueFrom:
+            configMapKeyRef:
+              name: ml-training-config
+              key: MIN_SUPPORT
+        - name: MIN_CONFIDENCE
+          valueFrom:
+            configMapKeyRef:
+              name: ml-training-config
+              key: MIN_CONFIDENCE
+        command: ["python", "/app/train_model.py"]
         volumeMounts:
         - name: shared-volume
           mountPath: /shared
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
       volumes:
       - name: shared-volume
         persistentVolumeClaim:

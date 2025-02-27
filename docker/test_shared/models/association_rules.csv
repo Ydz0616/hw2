@@ -1,9 +1,0 @@
-Antecedent,Consequent,Support,Confidence,Lift
-['Break Up with Him'],['House Party'],0.013,0.48148148148148145,12.345679012345679
-['Leave The Night On'],['Play It Again'],0.012,0.3529411764705882,9.287925696594426
-['pick up the phone'],['No Problem (feat. Lil Wayne & 2 Chainz)'],0.013,0.35135135135135137,5.855855855855856
-['House Party'],['Break Up with Him'],0.013,0.3333333333333333,12.345679012345679
-['Play It Again'],['Leave The Night On'],0.012,0.31578947368421056,9.287925696594428
-['iSpy (feat. Lil Yachty)'],['No Problem (feat. Lil Wayne & 2 Chainz)'],0.012,0.2553191489361702,4.25531914893617
-['No Problem (feat. Lil Wayne & 2 Chainz)'],['pick up the phone'],0.013,0.21666666666666667,5.855855855855856
-['No Problem (feat. Lil Wayne & 2 Chainz)'],['iSpy (feat. Lil Yachty)'],0.012,0.2,4.25531914893617
