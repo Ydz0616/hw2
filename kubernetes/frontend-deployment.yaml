@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: song-recommender-frontend
-        image: yuandongzhang/song-recommender-frontend:1.0.4
+        image: yuandongzhang/song-recommender-frontend:1.0.5
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
