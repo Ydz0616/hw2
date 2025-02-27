@@ -31,7 +31,9 @@ from song_recommender import SongRecommender
 DATA_DIR = os.environ.get('DATA_DIR', '/data')
 SHARED_DIR = os.environ.get('SHARED_DIR', '/shared')
 MODEL_DIR = os.path.join(SHARED_DIR, 'models')
-PLAYLIST_FILE = os.environ.get('PLAYLIST_FILE', os.path.join(DATA_DIR, '2023_spotify_ds2.csv'))
+# Get dataset version from environment variable (default to ds2 if not specified)
+DATASET_VERSION = os.environ.get('DATASET_VERSION', 'ds2')
+PLAYLIST_FILE = os.environ.get('PLAYLIST_FILE', os.path.join(DATA_DIR, f'2023_spotify_{DATASET_VERSION}.csv'))
 SONGS_FILE = os.environ.get('SONGS_FILE', os.path.join(DATA_DIR, '2023_spotify_songs.csv'))
 MODEL_FILE = os.environ.get('MODEL_FILE', os.path.join(MODEL_DIR, 'song_recommender.pkl'))
 INFO_FILE = os.environ.get('INFO_FILE', os.path.join(MODEL_DIR, 'model_info.json'))
@@ -69,6 +71,7 @@ def save_model_info(model_file, training_parameters):
         "model_size": file_size,
         "model_hash": file_hash,
         "modified_date": modified_date,
+        "dataset_version": DATASET_VERSION,
         "training_parameters": training_parameters,
         "training_time": time.time()
     }
@@ -87,6 +90,7 @@ def main():
     os.makedirs(MODEL_DIR, exist_ok=True)
     
     logger.info("Starting model training...")
+    logger.info(f"Dataset Version: {DATASET_VERSION}")
     logger.info(f"Parameters: MIN_SUPPORT: {MIN_SUPPORT}, MIN_CONFIDENCE: {MIN_CONFIDENCE}")
     logger.info(f"Files: PLAYLIST_FILE: {PLAYLIST_FILE}, SONGS_FILE: {SONGS_FILE}")
     
@@ -122,7 +126,8 @@ def main():
         training_parameters = {
             "min_support": MIN_SUPPORT,
             "min_confidence": MIN_CONFIDENCE,
-            "algorithm": "apriori"
+            "algorithm": "apriori",
+            "dataset_version": DATASET_VERSION
         }
         save_model_info(MODEL_FILE, training_parameters)
         
