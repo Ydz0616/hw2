@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: song-recommender-ml-job-ds-$(DATASET)
+  name: song-recommender-ml-job-ds1
   namespace: yuandong
 spec:
   template:
