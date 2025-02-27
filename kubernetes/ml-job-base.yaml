@@ -25,15 +25,9 @@ spec:
         - name: DATA_DIR
           value: "/shared/data"
         - name: MIN_SUPPORT
-          valueFrom:
-            configMapKeyRef:
-              name: ml-training-config
-              key: MIN_SUPPORT
+          value: "0.05"
         - name: MIN_CONFIDENCE
-          valueFrom:
-            configMapKeyRef:
-              name: ml-training-config
-              key: MIN_CONFIDENCE
+          value: "0.1"
         command: ["python", "/app/train_model.py"]
         volumeMounts:
         - name: shared-volume
