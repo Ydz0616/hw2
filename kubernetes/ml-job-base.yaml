@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: song-recommender-ml-job-ds2-haha
+  name: song-recommender-ml-job-ds1-heyhey
   namespace: yuandong
 spec:
   template:
@@ -30,7 +30,7 @@ spec:
         - name: MIN_CONFIDENCE
           value: "0.1"
         - name: DATASET_VERSION
-          value: "ds2"
+          value: "ds1"
         command: ["python", "/app/train_model.py"]
         volumeMounts:
         - name: shared-volume
