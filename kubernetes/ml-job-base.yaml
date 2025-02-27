@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: song-recommender-ml-job-ds1-v2
+  name: song-recommender-ml-job-ds1-hi
   namespace: yuandong
 spec:
   template:
@@ -20,7 +20,7 @@ spec:
           mountPath: /home/yuandong
       containers:
       - name: song-recommender-ml
-        image: yuandongzhang/song-recommender-ml:1.0.3
+        image: yuandongzhang/song-recommender-ml:1.0.4
         env:
         - name: DATA_DIR
           value: "/shared/data"
