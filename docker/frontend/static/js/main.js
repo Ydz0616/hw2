@@ -4,7 +4,6 @@ const addSongBtn = document.getElementById('add-song-btn');
 const songList = document.getElementById('song-list');
 const clearSongsBtn = document.getElementById('clear-songs-btn');
 const getRecommendationsBtn = document.getElementById('get-recommendations-btn');
-const recommendationsCount = document.getElementById('recommendations-count');
 const recommendationsList = document.getElementById('recommendations-list');
 const ruleRecommendationsList = document.getElementById('rule-recommendations-list');
 const similarityRecommendationsList = document.getElementById('similarity-recommendations-list');
@@ -113,7 +112,7 @@ async function getRecommendations() {
     
     try {
         // Get selected count
-        const count = parseInt(recommendationsCount.value);
+
         
         // Prepare request data
         const requestData = {

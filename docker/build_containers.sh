@@ -3,7 +3,7 @@
 
 # Set environment variables
 DOCKER_REPO="yuandongzhang"
-IMAGE_TAG="1.0.5"
+IMAGE_TAG="1.0.6"
 
 # Create directories if they don't exist
 mkdir -p ../data
